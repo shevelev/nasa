@@ -1,10 +1,10 @@
-package ru.crashdev.nasa.ui
+package ru.crashdev.nasa.ui.main
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ru.crashdev.nasa.R
-import ru.crashdev.nasa.model.Photos
+import ru.crashdev.nasa.repository.model.Photos
 
 class NasaAdapter(val data: List<Photos>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

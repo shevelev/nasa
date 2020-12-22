@@ -1,4 +1,4 @@
-package ru.crashdev.nasa.api
+package ru.crashdev.nasa.repository.remote
 
 import com.google.gson.Gson
 import retrofit2.Retrofit
