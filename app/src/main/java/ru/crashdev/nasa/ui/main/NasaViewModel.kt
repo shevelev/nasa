@@ -1,29 +1,29 @@
 package ru.crashdev.nasa.ui.main
 
-import android.util.Log
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import retrofit2.Response
 import ru.crashdev.nasa.repository.DataRepository
-import ru.crashdev.nasa.repository.remote.NasaApi.Companion.retrofit
-import ru.crashdev.nasa.repository.remote.NasaApiInterface
-import ru.crashdev.nasa.repository.model.Photos
+import ru.crashdev.nasa.repository.model.Latest_photos
 import ru.crashdev.nasa.repository.model.PhotosResponse
 import ru.crashdev.nasa.utils.ApiException
 
-class NasaViewModel : ViewModel() {
-    lateinit var repository: DataRepository
+class NasaViewModel(private val repository: DataRepository = DataRepository()) : ViewModel() {
 
-    @JvmName("setRepository1")
-    fun setRepository(repository: DataRepository) {
-        this.repository = repository
+    private val allPhotos = MediatorLiveData<List<Latest_photos>>()
+
+    init {
+        getAllPhotos()
+    }
+
+    fun getSavedPhotos() = allPhotos
+
+    private fun getAllPhotos() {
+        allPhotos.addSource(repository.getLocalData()) {
+            allPhotos.postValue(it)
+        }
     }
 
     suspend fun loadRemote(): PhotosResponse {
-        Log.d("qwe","4")
         val response = repository.getRemoteData()
         if (response.isSuccessful) {
             return response.body()!!
@@ -32,12 +32,12 @@ class NasaViewModel : ViewModel() {
         }
     }
 
-    suspend fun loadLocal(): List<Photos>? {
-        return repository.getLocalData()
-    }
-
-    suspend fun saveToLocal(it: List<Photos>) {
+    suspend fun saveToLocal(it: List<Latest_photos>) {
         repository.saveAllToLocal(it)
-
     }
+
+    fun deleteImage(photoid: Int) {
+        repository.deleteImage(photoid)
+    }
+
 }

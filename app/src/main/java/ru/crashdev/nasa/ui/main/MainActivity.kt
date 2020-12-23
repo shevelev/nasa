@@ -3,8 +3,6 @@ package ru.crashdev.nasa.ui.main
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -14,11 +12,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.crashdev.nasa.R
-import ru.crashdev.nasa.repository.DataRepository
-import ru.crashdev.nasa.repository.local.LocalRepository
-import ru.crashdev.nasa.repository.model.Photos
-import ru.crashdev.nasa.repository.remote.RemoteRepository
+import ru.crashdev.nasa.repository.model.Latest_photos
 import ru.crashdev.nasa.utils.ApiException
+import ru.crashdev.nasa.utils.ItemViewClickListener
 import ru.crashdev.nasa.utils.NoInternetException
 import ru.crashdev.nasa.utils.isOnline
 
@@ -32,16 +28,17 @@ import ru.crashdev.nasa.utils.isOnline
 7. подключить репозиторий с 2 запросами, 1 на локальный бд, 2 на запрос к апи
 8. настроить репозиторий с проверкой по ид или по другому уникальному параметру
 9. обработка ошибок, если нет интернета
+10. по длительному нажатию удалять картинку из базы
+11. заменить рефтрофит на okhttp3
 --пока здесь
-10. по длительному нажатию раскрывать картинку на весь экран.
-11. обновление по кнопке?
-12. реф и красота
+12. по нажатию раскрывать картинку на весь экран.
+13. реф и красота
  */
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ItemViewClickListener {
 
     private lateinit var viewModel: NasaViewModel
-    private val listPhotos: MutableLiveData<List<Photos>> = MutableLiveData()
+    private val _adapter = NasaAdapter(mutableListOf(), this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,25 +46,25 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this).get(NasaViewModel::class.java)
         rv_main.layoutManager = GridLayoutManager(this, 2)
-        rv_main.adapter = NasaAdapter(listOf())
-        //need di
-        val localRepository = LocalRepository(applicationContext)
-        val remoteRepository = RemoteRepository(applicationContext)
-        val repository = DataRepository(localRepository, remoteRepository)
-        viewModel.setRepository(repository)
+        rv_main.adapter = _adapter
+
+        viewModel.getSavedPhotos().observe(this, { photos ->
+            photos?.let {
+                _adapter.setPhotos(photos)
+            }
+        })
+
         loadData()
     }
 
     private fun loadData() {
         CoroutineScope(Dispatchers.IO).launch {
-
             try {
                 if (isOnline()) {
                     val remote = viewModel.loadRemote()
-                    if (remote.photos.isNotEmpty()) {
+                    if (remote.latest_photos.isNotEmpty()) {
                         withContext(Dispatchers.Main) {
-                            viewModel.saveToLocal(remote.photos)
-                            configureAdapterRecyclerView("Load remote DB", remote.photos)
+                            viewModel.saveToLocal(remote.latest_photos)
                         }
                     }
                 } else {
@@ -78,23 +75,19 @@ class MainActivity : AppCompatActivity() {
             } catch (error: NoInternetException) {
                 Snackbar.make(root, "${error.message}", Snackbar.LENGTH_SHORT).show()
             }
-
-            val local = viewModel.loadLocal()
-            local.let {
-                if (it != null) {
-                    listPhotos.postValue(it.sortedBy { it.earth_date })
-
-                    withContext(Dispatchers.Main) {
-                        configureAdapterRecyclerView("Load locale DB", it)
-                    }
-                }
-            }
-
         }
     }
 
-    private fun configureAdapterRecyclerView(message: String, list: List<Photos>) {
-        rv_main.adapter = NasaAdapter(list)
-       // Snackbar.make(root, message, Snackbar.LENGTH_SHORT).show()
+
+    override fun onItemViewLongClick(latestphotos: Latest_photos) {
+        CoroutineScope(Dispatchers.IO).launch {
+            viewModel.deleteImage(latestphotos.photos_id)
+        }
+
+        Log.d("qwe", "delete ${latestphotos.photos_id}")
+    }
+
+    override fun onItemViewClick(latestphotos: Latest_photos) {
+        Log.d("qwe", "open ${latestphotos.photos_id}")
     }
 }

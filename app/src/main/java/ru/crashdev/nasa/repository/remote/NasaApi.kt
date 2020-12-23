@@ -1,22 +1,17 @@
 package ru.crashdev.nasa.repository.remote
 
-import com.google.gson.Gson
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Query
+import ru.crashdev.nasa.repository.remote.RetrofitClient.Companion.API_KEY
+import ru.crashdev.nasa.repository.remote.RetrofitClient.Companion.CAMERA
+import ru.crashdev.nasa.repository.model.PhotosResponse
 
-class NasaApi {
-    companion object {
-
-        //https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?api_key=cdmjSNiSg058NkQ8FsSaXlaUkNO8Eve3wexNhnwg&sol=1000
-        const val BASE_URL: String = "https://api.nasa.gov/mars-photos/api/v1/"
-        const val API_KEY: String = "cdmjSNiSg058NkQ8FsSaXlaUkNO8Eve3wexNhnwg"
-        const val ROVER: String = "Curiosity"
-        const val CAMERA: String = "NAVCAM"
-        const val SOL: Int = 1000
-
-        fun retrofit(): Retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create(Gson()))
-            .build()
-    }
+interface NasaApi {
+    @GET("rovers/curiosity/latest_photos")
+    suspend fun getRovers(
+        @Query("api_key") api_key: String = API_KEY,
+        @Query("camera") camera : String = CAMERA,
+        @Query("page") page : Int = 1
+    ): Response<PhotosResponse>
 }

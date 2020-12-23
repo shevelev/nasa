@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName
 import org.jetbrains.annotations.NotNull
 
 @Entity(tableName = "tbl_photos")
-data class Photos (
+data class Latest_photos (
     @PrimaryKey(autoGenerate = false)
     @SerializedName("id")
     val photos_id : Int,
