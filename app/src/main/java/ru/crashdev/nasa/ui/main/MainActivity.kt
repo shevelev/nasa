@@ -1,5 +1,6 @@
 package ru.crashdev.nasa.ui.main
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.crashdev.nasa.R
 import ru.crashdev.nasa.repository.model.Latest_photos
+import ru.crashdev.nasa.ui.zoom.zoomImage
 import ru.crashdev.nasa.utils.ApiException
 import ru.crashdev.nasa.utils.ItemViewClickListener
 import ru.crashdev.nasa.utils.NoInternetException
@@ -30,8 +32,8 @@ import ru.crashdev.nasa.utils.isOnline
 9. обработка ошибок, если нет интернета
 10. по длительному нажатию удалять картинку из базы
 11. заменить рефтрофит на okhttp3
---пока здесь
 12. по нажатию раскрывать картинку на весь экран.
+--пока здесь
 13. реф и красота
  */
 
@@ -88,6 +90,10 @@ class MainActivity : AppCompatActivity(), ItemViewClickListener {
     }
 
     override fun onItemViewClick(latestphotos: Latest_photos) {
+        val intent = Intent(this, zoomImage::class.java)
+        intent.putExtra("image", latestphotos.img_src)
+        startActivity(intent)
+
         Log.d("qwe", "open ${latestphotos.photos_id}")
     }
 }
