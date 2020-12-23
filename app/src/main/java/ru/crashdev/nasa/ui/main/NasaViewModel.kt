@@ -12,6 +12,7 @@ import ru.crashdev.nasa.repository.remote.NasaApi.Companion.retrofit
 import ru.crashdev.nasa.repository.remote.NasaApiInterface
 import ru.crashdev.nasa.repository.model.Photos
 import ru.crashdev.nasa.repository.model.PhotosResponse
+import ru.crashdev.nasa.utils.ApiException
 
 class NasaViewModel : ViewModel() {
     lateinit var repository: DataRepository
@@ -21,8 +22,14 @@ class NasaViewModel : ViewModel() {
         this.repository = repository
     }
 
-    suspend fun loadRemote(): Response<PhotosResponse> {
-        return repository.getRemoteData()
+    suspend fun loadRemote(): PhotosResponse {
+        Log.d("qwe","4")
+        val response = repository.getRemoteData()
+        if (response.isSuccessful) {
+            return response.body()!!
+        } else {
+            throw ApiException(response.code().toString())
+        }
     }
 
     suspend fun loadLocal(): List<Photos>? {
