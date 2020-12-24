@@ -3,4 +3,5 @@
     <string name="deleteOrNot">Отменить удаление?</string>
     <string name="deleteYes">Да</string>
     <string name="noInternet">Нет подключений</string>
+    <string name="iv_description">Photo from Mars</string>
 </resources>
