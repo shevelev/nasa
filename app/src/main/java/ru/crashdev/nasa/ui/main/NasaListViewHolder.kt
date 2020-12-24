@@ -8,11 +8,9 @@ import ru.crashdev.nasa.repository.model.Latest_photos
 import ru.crashdev.nasa.utils.ItemViewClickListener
 
 class NasaListViewHolder(itemView: View, private val itemViewClickListener : ItemViewClickListener) : RecyclerView.ViewHolder(itemView) {
-
-
-
     fun bindView(latestphotos: Latest_photos) {
         itemView.tv_date.text = latestphotos.earth_date
+        itemView.tv_photo_id.text = latestphotos.photos_id.toString()
 
         Glide.with(itemView.context)
             .load(latestphotos.img_src)

@@ -15,4 +15,7 @@ interface NasaDao {
 
     @Query("update tbl_photos set img_src='none' where photos_id = :photoId")
     fun deleteImage(photoId: Int)
+
+    @Query("update tbl_photos set img_src= :imgSrc where photos_id = :photoId")
+    fun undoDeleteImage(photoId: String, imgSrc: String)
 }

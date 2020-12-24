@@ -18,11 +18,11 @@ class DataRepository {
         allLatestphotos = nasaDao.getAllPhotos()
     }
 
-    suspend fun getRemoteData() : Response<PhotosResponse> {
+    suspend fun getRemoteData(): Response<PhotosResponse> {
         return retrofitClient.getRovers()
     }
 
-    fun getLocalData() : LiveData<List<Latest_photos>> {
+    fun getLocalData(): LiveData<List<Latest_photos>> {
         return nasaDao.getAllPhotos()
     }
 
@@ -32,5 +32,9 @@ class DataRepository {
 
     fun deleteImage(photoId: Int) {
         nasaDao.deleteImage(photoId)
+    }
+
+    fun undoDeleteImage(tmpPhotos: Latest_photos) {
+        nasaDao.undoDeleteImage(tmpPhotos.photos_id.toString(), tmpPhotos.img_src)
     }
 }

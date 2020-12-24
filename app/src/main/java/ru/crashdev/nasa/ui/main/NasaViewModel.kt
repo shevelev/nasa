@@ -40,4 +40,9 @@ class NasaViewModel(private val repository: DataRepository = DataRepository()) :
         repository.deleteImage(photoid)
     }
 
+    fun undo(tmpPhotos: Latest_photos) {
+        repository.undoDeleteImage(tmpPhotos)
+
+    }
+
 }

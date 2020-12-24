@@ -1,9 +1,8 @@
 package ru.crashdev.nasa.ui.main
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -33,8 +32,8 @@ import ru.crashdev.nasa.utils.isOnline
 10. по длительному нажатию удалять картинку из базы
 11. заменить рефтрофит на okhttp3
 12. по нажатию раскрывать картинку на весь экран.
---пока здесь
 13. реф и красота
+--пока здесь
  */
 
 class MainActivity : AppCompatActivity(), ItemViewClickListener {
@@ -48,6 +47,7 @@ class MainActivity : AppCompatActivity(), ItemViewClickListener {
 
         viewModel = ViewModelProvider(this).get(NasaViewModel::class.java)
         rv_main.layoutManager = GridLayoutManager(this, 2)
+        rv_main.addItemDecoration(AlbumGridItemDecoration(8, 8))
         rv_main.adapter = _adapter
 
         viewModel.getSavedPhotos().observe(this, { photos ->
@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity(), ItemViewClickListener {
                         }
                     }
                 } else {
-                    throw NoInternetException("Нет подключений")
+                    throw NoInternetException(getString(R.string.noInternet))
                 }
             } catch (error: ApiException) {
                 Snackbar.make(root, "${error.message}", Snackbar.LENGTH_SHORT).show()
@@ -85,15 +85,18 @@ class MainActivity : AppCompatActivity(), ItemViewClickListener {
         CoroutineScope(Dispatchers.IO).launch {
             viewModel.deleteImage(latestphotos.photos_id)
         }
-
-        Log.d("qwe", "delete ${latestphotos.photos_id}")
+        Snackbar.make(rv_main, getString(R.string.deleteOrNot), Snackbar.LENGTH_LONG)
+            .setAction(getString(R.string.deleteYes)) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    viewModel.undo(latestphotos)
+                }
+            }
+            .show()
     }
 
     override fun onItemViewClick(latestphotos: Latest_photos) {
         val intent = Intent(this, zoomImage::class.java)
         intent.putExtra("image", latestphotos.img_src)
         startActivity(intent)
-
-        Log.d("qwe", "open ${latestphotos.photos_id}")
     }
 }
