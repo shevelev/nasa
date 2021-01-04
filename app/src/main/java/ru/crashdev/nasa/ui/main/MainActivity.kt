@@ -3,8 +3,9 @@ package ru.crashdev.nasa.ui.main
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
@@ -12,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.crashdev.nasa.R
+import ru.crashdev.nasa.databinding.ActivityMainBinding
 import ru.crashdev.nasa.repository.model.Latest_photos
 import ru.crashdev.nasa.ui.zoom.zoomImage
 import ru.crashdev.nasa.utils.ApiException
@@ -19,36 +21,22 @@ import ru.crashdev.nasa.utils.ItemViewClickListener
 import ru.crashdev.nasa.utils.NoInternetException
 import ru.crashdev.nasa.utils.isOnline
 
-/*
-1. сделать 1 страницу с recicleview
-2. настроить ретрофит с урлом наса + apikey
-3. сделать модели из apikey
-4. подключить glide
-5. сделать адаптер с текстом+фото
-6. настроить адаптер на данные из ретрофита, брать картинку+возможно текст
-7. подключить репозиторий с 2 запросами, 1 на локальный бд, 2 на запрос к апи
-8. настроить репозиторий с проверкой по ид или по другому уникальному параметру
-9. обработка ошибок, если нет интернета
-10. по длительному нажатию удалять картинку из базы
-11. заменить рефтрофит на okhttp3
-12. по нажатию раскрывать картинку на весь экран.
-13. реф и красота
---пока здесь
- */
-
 class MainActivity : AppCompatActivity(), ItemViewClickListener {
 
     private lateinit var viewModel: NasaViewModel
-    private val _adapter = NasaAdapter(mutableListOf(), this)
+    private val _adapter = NasaAdapter(mutableListOf())
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
+        val binding: ActivityMainBinding =
+            DataBindingUtil.setContentView(this, R.layout.activity_main)
         viewModel = ViewModelProvider(this).get(NasaViewModel::class.java)
-        rv_main.layoutManager = GridLayoutManager(this, 2)
-        rv_main.addItemDecoration(AlbumGridItemDecoration(8, 8))
-        rv_main.adapter = _adapter
+
+        binding.rvMain.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = _adapter
+        }
 
         viewModel.getSavedPhotos().observe(this, { photos ->
             photos?.let {

@@ -2,34 +2,32 @@ package ru.crashdev.nasa.ui.main
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import ru.crashdev.nasa.R
+import ru.crashdev.nasa.databinding.NasaItemGridPhotosBinding
 import ru.crashdev.nasa.repository.model.Latest_photos
-import ru.crashdev.nasa.utils.ItemViewClickListener
 
-class NasaAdapter(
-    private val data: MutableList<Latest_photos>,
-    private val itemViewClickListener: ItemViewClickListener
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return NasaListViewHolder(
-            LayoutInflater.from(parent.context)
-                .inflate(R.layout.nasa_item_grid_photos, parent, false),
-            itemViewClickListener
-        )
+class NasaAdapter(private val data: MutableList<Latest_photos>) : RecyclerView.Adapter<NasaListViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NasaListViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = DataBindingUtil.inflate<NasaItemGridPhotosBinding>(inflater,
+            R.layout.nasa_item_grid_photos,
+            parent,
+            false)
+        return  NasaListViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val nasaListViewHolder = holder as NasaListViewHolder
-        nasaListViewHolder.bindView(data[position])
+    override fun onBindViewHolder(holder: NasaListViewHolder, position: Int) {
+        val r = data[position]
+        holder.bind(r)
     }
 
-    override fun getItemCount(): Int = data.size
+    override fun getItemCount() = data.size
 
-    fun setPhotos(latestphotosList: List<Latest_photos>) {
+    fun setPhotos(list: List<Latest_photos>) {
         this.data.clear()
-        this.data.addAll(latestphotosList)
+        this.data.addAll(list)
         notifyDataSetChanged()
     }
-
 }

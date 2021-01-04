@@ -11,6 +11,20 @@ class NasaViewModel(private val repository: DataRepository = DataRepository()) :
 
     private val allPhotos = MediatorLiveData<List<Latest_photos>>()
 
+    var photos: Latest_photos? = null
+        set (photos) {
+            field = photos
+        }
+
+    val photoId: Int?
+        get() = photos?.photos_id
+
+    val earth: String?
+        get() = photos?.earth_date
+
+    val img : String?
+        get() = photos?.img_src
+
     init {
         getAllPhotos()
     }
