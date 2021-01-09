@@ -5,18 +5,11 @@ import retrofit2.Response
 import ru.crashdev.nasa.repository.local.NasaDao
 import ru.crashdev.nasa.repository.model.Latest_photos
 import ru.crashdev.nasa.repository.model.PhotosResponse
-import ru.crashdev.nasa.repository.remote.RetrofitClient
-import ru.crashdev.nasa.utils.db
+import ru.crashdev.nasa.repository.remote.NasaApi
 
-class DataRepository {
-
-    private val nasaDao: NasaDao = db.nasaDao()
-    private val retrofitClient = RetrofitClient()
-    private val allLatestphotos: LiveData<List<Latest_photos>>
-
-    init {
-        allLatestphotos = nasaDao.getAllPhotos()
-    }
+class NasaRepository(
+    private val retrofitClient: NasaApi, private val nasaDao: NasaDao
+) {
 
     suspend fun getRemoteData(): Response<PhotosResponse> {
         return retrofitClient.getRovers()

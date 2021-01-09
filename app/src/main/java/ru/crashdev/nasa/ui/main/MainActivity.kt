@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
@@ -16,22 +15,23 @@ import ru.crashdev.nasa.R
 import ru.crashdev.nasa.databinding.ActivityMainBinding
 import ru.crashdev.nasa.repository.model.Latest_photos
 import ru.crashdev.nasa.ui.zoom.zoomImage
-import ru.crashdev.nasa.utils.ApiException
 import ru.crashdev.nasa.utils.ItemViewClickListener
-import ru.crashdev.nasa.utils.NoInternetException
 import ru.crashdev.nasa.utils.isOnline
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import ru.crashdev.nasa.utils.ApiException
+import ru.crashdev.nasa.utils.NoInternetException
 
 class MainActivity : AppCompatActivity(), ItemViewClickListener {
 
-    private lateinit var viewModel: NasaViewModel
+    private val viewModel by viewModel<NasaViewModel>()
     private val _adapter = NasaAdapter(mutableListOf())
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding: ActivityMainBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_main)
-        viewModel = ViewModelProvider(this).get(NasaViewModel::class.java)
+
+        _adapter.setView(viewModel)
 
         binding.rvMain.apply {
             layoutManager = LinearLayoutManager(context)

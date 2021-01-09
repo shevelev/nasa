@@ -9,13 +9,16 @@ import ru.crashdev.nasa.databinding.NasaItemGridPhotosBinding
 import ru.crashdev.nasa.repository.model.Latest_photos
 
 class NasaAdapter(private val data: MutableList<Latest_photos>) : RecyclerView.Adapter<NasaListViewHolder>() {
+
+    private lateinit var viewModel: NasaViewModel
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NasaListViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = DataBindingUtil.inflate<NasaItemGridPhotosBinding>(inflater,
             R.layout.nasa_item_grid_photos,
             parent,
             false)
-        return  NasaListViewHolder(binding)
+        return  NasaListViewHolder(binding, viewModel)
     }
 
     override fun onBindViewHolder(holder: NasaListViewHolder, position: Int) {
@@ -29,5 +32,9 @@ class NasaAdapter(private val data: MutableList<Latest_photos>) : RecyclerView.A
         this.data.clear()
         this.data.addAll(list)
         notifyDataSetChanged()
+    }
+
+    fun setView(viewModel: NasaViewModel) {
+        this.viewModel = viewModel
     }
 }

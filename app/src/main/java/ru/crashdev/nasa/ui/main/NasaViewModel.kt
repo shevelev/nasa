@@ -2,12 +2,12 @@ package ru.crashdev.nasa.ui.main
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import ru.crashdev.nasa.repository.DataRepository
+import ru.crashdev.nasa.repository.NasaRepository
 import ru.crashdev.nasa.repository.model.Latest_photos
 import ru.crashdev.nasa.repository.model.PhotosResponse
 import ru.crashdev.nasa.utils.ApiException
 
-class NasaViewModel(private val repository: DataRepository = DataRepository()) : ViewModel() {
+class NasaViewModel(private val repository: NasaRepository) : ViewModel() {
 
     private val allPhotos = MediatorLiveData<List<Latest_photos>>()
 
